@@ -182,19 +182,19 @@ if [[ "$INSTALL_MAIL_SERVER" =~ ^[Yy]$ ]]; then
     if [[ "$GENERATE_SSL_CERT" =~ ^[Yy]$ ]];
     then
       # Generate Self-Signed SSL Certificate for Dovecot
-      sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/dovecot.pem -out /etc/ssl/certs/dovecot.pem
-      sudo chmod 600 /etc/ssl/private/dovecot.pem
-      sudo chmod 644 /etc/ssl/certs/dovecot.pem
+      openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/dovecot.pem -out /etc/ssl/certs/dovecot.pem
+      chmod 600 /etc/ssl/private/dovecot.pem
+      chmod 644 /etc/ssl/certs/dovecot.pem
     else
       # Ask for the paths to the user-provided SSL certificate and key
       read -p "Enter the path to the SSL certificate file: " SSL_CERT_FILE
       read -p "Enter the path to the SSL certificate key file: " SSL_KEY_FILE
       
       # Copy the user-provided SSL certificate and key to the Dovecot configuration directory
-      sudo cp "$SSL_CERT_FILE" /etc/ssl/certs/dovecot.pem
-      sudo cp "$SSL_KEY_FILE" /etc/ssl/private/dovecot.pem
-      sudo chmod 600 /etc/ssl/private/dovecot.pem
-      sudo chmod 644 /etc/ssl/certs/dovecot.pem
+      cp "$SSL_CERT_FILE" /etc/ssl/certs/dovecot.pem
+      cp "$SSL_KEY_FILE" /etc/ssl/private/dovecot.pem
+      chmod 600 /etc/ssl/private/dovecot.pem
+      chmod 644 /etc/ssl/certs/dovecot.pem
     fi
 
 
