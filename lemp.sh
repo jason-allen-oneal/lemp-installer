@@ -168,4 +168,41 @@ if [[ "$INSTALL_PHPMYADMIN" =~ ^[Yy]$ ]]; then
     fi
 fi
 
+# Install Mail Server (Optional)
+read -p "Do you want to install a Mail Server? (y/n): " INSTALL_MAIL_SERVER
+if [[ "$INSTALL_MAIL_SERVER" =~ ^[Yy]$ ]]; then
+    if [ "$PKG_MANAGER" = "apt-get" ]; then
+        apt install postfix dovecot-core dovecot-imapd dovecot-lmtpd -y
+    elif [ "$PKG_MANAGER" = "yum" ]; then
+        yum install postfix dovecot -y
+    fi
+
+    # Postfix Configuration
+    echo "myhostname = $(hostname -I | cut -d' ' -f1)" >> /etc/postfix/main.cf
+    echo "mydomain = example.com" >> /etc/postfix/main.cf
+    echo "relayhost =" >> /etc/postfix/main.cf
+    echo "mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128" >> /etc/postfix/main.cf
+    echo "smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem" >> /etc/postfix/main.cf
+    echo "smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" >> /etc/postfix/main.cf
+    echo "smtpd_use_tls=yes" >> /etc/postfix/main.cf
+    echo "smtpd_tls_auth_only = yes" >> /etc/postfix/main.cf
+    echo "smtpd_tls_session_cache_database = btree:\${data_directory}/smtpd_scache" >> /etc/postfix/main.cf
+
+    # Dovecot Configuration
+    echo "protocols = imap lmtp" >> /etc/dovecot/dovecot.conf
+    echo "ssl = required" >> /etc/dovecot/dovecot.conf
+    echo "ssl_cert = </etc/ssl/certs/dovecot.pem" >> /etc/dovecot/dovecot.conf
+    echo "ssl_key = </etc/ssl/private/dovecot.pem" >> /etc/dovecot/dovecot.conf
+
+    # Restart Postfix and Dovecot
+    if [ "$PKG_MANAGER" = "apt-get" ]; then
+        systemctl restart postfix
+        systemctl restart dovecot
+    elif [ "$PKG_MANAGER" = "yum" ]; then
+        systemctl restart postfix
+        systemctl restart dovecot
+    fi
+fi
+
+
 echo "LEMP stack and phpMyAdmin have been installed successfully."
