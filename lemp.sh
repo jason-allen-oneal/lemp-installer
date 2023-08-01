@@ -154,6 +154,12 @@ if [[ "$INSTALL_PHPMYADMIN" =~ ^[Yy]$ ]]; then
         }
     }
     " > /etc/nginx/sites-available/phpmyadmin
+    
+    # Add the following lines to the Nginx server block for phpMyAdmin
+    sed -i '/location \\/phpmyadmin {/a \ location ~* \\/phpmyadmin\\/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ { root \\/usr\\/share\\/; }' /etc/nginx/sites-available/phpmyadmin
+    
+    # Test Nginx configuration for syntax errors
+    nginx -t
 
     ln -s /etc/nginx/sites-available/phpmyadmin /etc/nginx/sites-enabled/
     rm /etc/nginx/sites-enabled/default
