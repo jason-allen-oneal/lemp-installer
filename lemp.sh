@@ -176,6 +176,27 @@ if [[ "$INSTALL_MAIL_SERVER" =~ ^[Yy]$ ]]; then
     elif [ "$PKG_MANAGER" = "yum" ]; then
         yum install postfix dovecot -y
     fi
+    
+    # Ask if the user wants to generate a self-signed SSL certificate
+    read -p "Do you want to generate a self-signed SSL certificate for Dovecot? (y/n): " GENERATE_SSL_CERT
+    if [[ "$GENERATE_SSL_CERT" =~ ^[Yy]$ ]];
+    then
+      # Generate Self-Signed SSL Certificate for Dovecot
+      sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/dovecot.pem -out /etc/ssl/certs/dovecot.pem
+      sudo chmod 600 /etc/ssl/private/dovecot.pem
+      sudo chmod 644 /etc/ssl/certs/dovecot.pem
+    else
+      # Ask for the paths to the user-provided SSL certificate and key
+      read -p "Enter the path to the SSL certificate file: " SSL_CERT_FILE
+      read -p "Enter the path to the SSL certificate key file: " SSL_KEY_FILE
+      
+      # Copy the user-provided SSL certificate and key to the Dovecot configuration directory
+      sudo cp "$SSL_CERT_FILE" /etc/ssl/certs/dovecot.pem
+      sudo cp "$SSL_KEY_FILE" /etc/ssl/private/dovecot.pem
+      sudo chmod 600 /etc/ssl/private/dovecot.pem
+      sudo chmod 644 /etc/ssl/certs/dovecot.pem
+    fi
+
 
     # Postfix Configuration
     echo "myhostname = $(hostname -I | cut -d' ' -f1)" >> /etc/postfix/main.cf
