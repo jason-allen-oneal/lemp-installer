@@ -27,9 +27,9 @@ fi
 
 # Install MySQL
 if [ "$PKG_MANAGER" = "apt-get" ]; then
-    apt install mysql-server -y
+    apt install mariadb-server -y
 elif [ "$PKG_MANAGER" = "yum" ]; then
-    yum install mysql-server -y
+    yum install mariadb-server -y
 fi
 
 # Secure MySQL installation
